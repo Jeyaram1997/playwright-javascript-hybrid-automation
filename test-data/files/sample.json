@@ -1,0 +1,36 @@
+{
+  "testDocument": {
+    "title": "Sample JSON Document",
+    "description": "This is a sample JSON file for testing file upload functionality",
+    "version": "1.0.0",
+    "createdDate": "2024-01-15",
+    "author": "Automation Team"
+  },
+  "testData": {
+    "users": [
+      {
+        "id": 1,
+        "name": "Test User 1",
+        "email": "user1@test.com"
+      },
+      {
+        "id": 2,
+        "name": "Test User 2",
+        "email": "user2@test.com"
+      }
+    ],
+    "products": [
+      {
+        "id": 101,
+        "name": "Sample Product",
+        "price": 29.99,
+        "category": "Electronics"
+      }
+    ]
+  },
+  "configuration": {
+    "timeout": 5000,
+    "retries": 3,
+    "debug": false
+  }
+}

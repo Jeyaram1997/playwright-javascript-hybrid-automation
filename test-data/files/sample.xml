@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testData>
+    <document>
+        <title>Sample XML Document</title>
+        <description>This is a sample XML file for testing file upload and parsing functionality</description>
+        <version>1.0.0</version>
+        <createdDate>2024-01-15</createdDate>
+        <author>Automation Team</author>
+    </document>
+    
+    <users>
+        <user id="1">
+            <name>Test User 1</name>
+            <email>user1@test.com</email>
+            <role>administrator</role>
+            <active>true</active>
+        </user>
+        <user id="2">
+            <name>Test User 2</name>
+            <email>user2@test.com</email>
+            <role>user</role>
+            <active>true</active>
+        </user>
+        <user id="3">
+            <name>Test User 3</name>
+            <email>user3@test.com</email>
+            <role>guest</role>
+            <active>false</active>
+        </user>
+    </users>
+    
+    <products>
+        <product id="101">
+            <name>Sample Product 1</name>
+            <price currency="USD">29.99</price>
+            <category>Electronics</category>
+            <inStock>true</inStock>
+            <quantity>50</quantity>
+        </product>
+        <product id="102">
+            <name>Sample Product 2</name>
+            <price currency="USD">49.99</price>
+            <category>Books</category>
+            <inStock>true</inStock>
+            <quantity>25</quantity>
+        </product>
+    </products>
+    
+    <configuration>
+        <settings>
+            <timeout>5000</timeout>
+            <retries>3</retries>
+            <debug>false</debug>
+            <environment>test</environment>
+        </settings>
+        <features>
+            <feature name="authentication" enabled="true"/>
+            <feature name="notifications" enabled="false"/>
+            <feature name="analytics" enabled="true"/>
+        </features>
+    </configuration>
+</testData>

@@ -1,0 +1,4 @@
+Test User 1,testuser1@example.com,password123,active
+Test User 2,testuser2@example.com,password456,inactive
+Admin User,admin@example.com,adminpass,active
+Manager User,manager@example.com,managerpass,active

@@ -1,0 +1,156 @@
+trigger:
+- main
+- develop
+
+pr:
+- main
+
+parameters:
+- name: testType
+  displayName: 'Test Type'
+  type: string
+  default: 'smoke'
+  values:
+  - smoke
+  - regression
+  - ui
+  - api
+  - mobile
+  - performance
+
+- name: browser
+  displayName: 'Browser'
+  type: string
+  default: 'chromium'
+  values:
+  - chromium
+  - firefox
+  - webkit
+
+- name: environment
+  displayName: 'Environment'
+  type: string
+  default: 'test'
+  values:
+  - test
+  - staging
+  - production
+
+variables:
+  nodeVersion: '18.x'
+  testType: ${{ parameters.testType }}
+  browser: ${{ parameters.browser }}
+  environment: ${{ parameters.environment }}
+
+stages:
+- stage: Test
+  displayName: 'Execute Tests'
+  jobs:
+  - job: PlaywrightTests
+    displayName: 'Playwright Tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    
+    strategy:
+      matrix:
+        Chromium:
+          browserName: 'chromium'
+        Firefox:
+          browserName: 'firefox'
+        WebKit:
+          browserName: 'webkit'
+    
+    steps:
+    - task: NodeTool@0
+      displayName: '🟢 Setup Node.js'
+      inputs:
+        versionSpec: $(nodeVersion)
+        
+    - script: |
+        npm ci
+        npx playwright install --with-deps $(browserName)
+      displayName: '📦 Install Dependencies'
+      
+    - script: |
+        cp .env.example .env
+        npm run init
+        npm run doctor
+      displayName: '🔧 Framework Setup'
+      
+    - script: |
+        node cli.js test:$(testType) --browser $(browserName) --env $(environment)
+      displayName: '🧪 Execute Tests - $(browserName)'
+      continueOnError: 'true'
+      
+    - script: npm run report:all
+      displayName: '📊 Generate Reports'
+      condition: always()
+      
+    - task: PublishTestResults@2
+      displayName: '📈 Publish Test Results'
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'reports/junit-results.xml'
+        mergeTestResults: true
+        testRunTitle: 'Playwright Tests - $(browserName)'
+      condition: always()
+      
+    - task: PublishPipelineArtifact@1
+      displayName: '📤 Upload Reports'
+      inputs:
+        targetPath: 'reports'
+        artifact: 'test-reports-$(browserName)'
+      condition: always()
+      
+    - task: PublishPipelineArtifact@1
+      displayName: '📤 Upload Screenshots'
+      inputs:
+        targetPath: 'reports/screenshots'
+        artifact: 'screenshots-$(browserName)'
+      condition: failed()
+
+- stage: Report
+  displayName: 'Generate Consolidated Report'
+  dependsOn: Test
+  condition: always()
+  jobs:
+  - job: AllureReport
+    displayName: 'Generate Allure Report'
+    pool:
+      vmImage: 'ubuntu-latest'
+    
+    steps:
+    - task: DownloadBuildArtifacts@0
+      displayName: '📥 Download Test Results'
+      inputs:
+        buildType: 'current'
+        downloadType: 'specific'
+        downloadPath: '$(System.ArtifactsDirectory)'
+        
+    - script: |
+        npm install -g allure-commandline
+        allure generate $(System.ArtifactsDirectory)/*/allure-results --clean -o allure-report
+      displayName: '📊 Generate Allure Report'
+      
+    - task: PublishPipelineArtifact@1
+      displayName: '📤 Publish Allure Report'
+      inputs:
+        targetPath: 'allure-report'
+        artifact: 'allure-report'
+
+- stage: Notify
+  displayName: 'Send Notifications'
+  dependsOn: [Test, Report]
+  condition: always()
+  jobs:
+  - job: Notifications
+    displayName: 'Send Notifications'
+    pool:
+      vmImage: 'ubuntu-latest'
+    
+    steps:
+    - script: |
+        npm run send:reports
+        npm run jira:report
+      displayName: '📧 Send Email & Jira Reports'
+      condition: failed()

@@ -1,0 +1,64 @@
+{
+  "name": "playwright-hybrid-framework",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Hybrid Automation Framework with Playwright, Cucumber and TestNG",
+  "author": "Jeyaram K",
+  "scripts": {
+    "test": "cucumber-js --require cucumber.js",
+    "test:ui": "cucumber-js --tags @ui",
+    "test:api": "cucumber-js --tags @api",
+    "test:mobile": "cucumber-js --tags @mobile",
+    "test:perf": "cucumber-js --tags @performance",
+    "test:smoke": "cucumber-js --tags @smoke",
+    "test:regression": "cucumber-js --tags @regression",
+    "report:allure": "node ./scripts/generate-allure-report.js",
+    "report:extent": "node ./scripts/generate-extent-report.js",
+    "report:performance": "node ./scripts/generate-performance-report.js",
+    "report:all": "npm run report:allure && npm run report:extent && npm run report:performance",
+    "send:reports": "node ./scripts/send-email-reports.js",
+    "jira:report": "node ./scripts/jira-reporter.js",
+    "cli": "node cli.js",
+    "init": "node cli.js init",
+    "doctor": "node cli.js doctor",
+    "methods": "node cli.js methods",
+    "install:browsers": "npx playwright install"
+  },
+  "bin": {
+    "playwright-framework": "./cli.js"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^9.2.0",
+    "@playwright/test": "^1.38.0",
+    "allure-commandline": "^2.23.0",
+    "allure-cucumberjs": "^2.5.0",
+    "allure-playwright": "^2.5.0",
+    "axios": "^1.4.0",
+    "chai": "^4.3.7",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "crypto-js": "^4.1.1",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.3.1",
+    "exceljs": "^4.3.0",
+    "form-data": "^4.0.0",
+    "fs-extra": "^11.1.1",
+    "html-pdf": "^3.0.1",
+    "mailparser": "^3.6.5",
+    "moment": "^2.29.4",
+    "nodemailer": "^6.9.4",
+    "pdf-lib": "^1.17.1",
+    "playwright-lighthouse": "^3.1.0",
+    "properties-reader": "^2.2.0",
+    "winston": "^3.10.0",
+    "xlsx": "^0.18.5",
+    "xmlbuilder": "^15.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.47.0",
+    "prettier": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

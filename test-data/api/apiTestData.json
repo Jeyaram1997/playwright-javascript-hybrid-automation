@@ -1,0 +1,300 @@
+{
+  "endpoints": {
+    "authentication": {
+      "login": "/api/v1/auth/login",
+      "logout": "/api/v1/auth/logout",
+      "refresh": "/api/v1/auth/refresh",
+      "register": "/api/v1/auth/register",
+      "forgotPassword": "/api/v1/auth/forgot-password",
+      "resetPassword": "/api/v1/auth/reset-password"
+    },
+    "users": {
+      "getUsers": "/api/v1/users",
+      "getUser": "/api/v1/users/{id}",
+      "createUser": "/api/v1/users",
+      "updateUser": "/api/v1/users/{id}",
+      "deleteUser": "/api/v1/users/{id}",
+      "getUserProfile": "/api/v1/users/{id}/profile"
+    },
+    "products": {
+      "getProducts": "/api/v1/products",
+      "getProduct": "/api/v1/products/{id}",
+      "createProduct": "/api/v1/products",
+      "updateProduct": "/api/v1/products/{id}",
+      "deleteProduct": "/api/v1/products/{id}",
+      "searchProducts": "/api/v1/products/search"
+    },
+    "orders": {
+      "getOrders": "/api/v1/orders",
+      "getOrder": "/api/v1/orders/{id}",
+      "createOrder": "/api/v1/orders",
+      "updateOrder": "/api/v1/orders/{id}",
+      "cancelOrder": "/api/v1/orders/{id}/cancel",
+      "getOrderHistory": "/api/v1/orders/history"
+    }
+  },
+  "requestBodies": {
+    "login": {
+      "valid": {
+        "email": "admin@example.com",
+        "password": "AdminPassword123!"
+      },
+      "invalid": {
+        "email": "invalid@example.com",
+        "password": "wrongpassword"
+      },
+      "missingEmail": {
+        "password": "AdminPassword123!"
+      },
+      "missingPassword": {
+        "email": "admin@example.com"
+      }
+    },
+    "register": {
+      "valid": {
+        "firstName": "New",
+        "lastName": "User",
+        "email": "newuser@example.com",
+        "password": "NewPassword123!",
+        "confirmPassword": "NewPassword123!"
+      },
+      "duplicate": {
+        "firstName": "Existing",
+        "lastName": "User",
+        "email": "admin@example.com",
+        "password": "Password123!",
+        "confirmPassword": "Password123!"
+      },
+      "weakPassword": {
+        "firstName": "Weak",
+        "lastName": "Password",
+        "email": "weak@example.com",
+        "password": "123",
+        "confirmPassword": "123"
+      }
+    },
+    "createUser": {
+      "valid": {
+        "firstName": "Test",
+        "lastName": "User",
+        "email": "test.user@example.com",
+        "role": "user",
+        "department": "Testing",
+        "isActive": true
+      },
+      "admin": {
+        "firstName": "Admin",
+        "lastName": "User",
+        "email": "admin.user@example.com",
+        "role": "administrator",
+        "department": "IT",
+        "isActive": true
+      },
+      "invalidEmail": {
+        "firstName": "Invalid",
+        "lastName": "Email",
+        "email": "not-an-email",
+        "role": "user",
+        "department": "Testing",
+        "isActive": true
+      }
+    },
+    "createProduct": {
+      "valid": {
+        "name": "Test Product",
+        "description": "A product for testing",
+        "price": 99.99,
+        "category": "Electronics",
+        "sku": "TEST-001",
+        "inStock": true,
+        "quantity": 100
+      },
+      "minimal": {
+        "name": "Minimal Product",
+        "price": 19.99,
+        "sku": "MIN-001"
+      },
+      "invalidPrice": {
+        "name": "Invalid Price Product",
+        "description": "Product with negative price",
+        "price": -10.00,
+        "sku": "INV-001"
+      }
+    },
+    "createOrder": {
+      "valid": {
+        "customerId": 1,
+        "items": [
+          {
+            "productId": 1,
+            "quantity": 2,
+            "price": 99.99
+          },
+          {
+            "productId": 2,
+            "quantity": 1,
+            "price": 149.99
+          }
+        ],
+        "shippingAddress": {
+          "street": "123 Test Street",
+          "city": "Test City",
+          "state": "Test State",
+          "zipCode": "12345",
+          "country": "US"
+        },
+        "paymentMethod": "credit_card"
+      },
+      "emptyItems": {
+        "customerId": 1,
+        "items": [],
+        "shippingAddress": {
+          "street": "123 Test Street",
+          "city": "Test City",
+          "state": "Test State",
+          "zipCode": "12345",
+          "country": "US"
+        },
+        "paymentMethod": "credit_card"
+      }
+    }
+  },
+  "expectedResponses": {
+    "login": {
+      "success": {
+        "statusCode": 200,
+        "body": {
+          "success": true,
+          "token": "string",
+          "user": {
+            "id": "number",
+            "email": "string",
+            "firstName": "string",
+            "lastName": "string",
+            "role": "string"
+          }
+        }
+      },
+      "failure": {
+        "statusCode": 401,
+        "body": {
+          "success": false,
+          "error": "Invalid credentials"
+        }
+      }
+    },
+    "getUsers": {
+      "success": {
+        "statusCode": 200,
+        "body": {
+          "success": true,
+          "data": "array",
+          "pagination": {
+            "page": "number",
+            "limit": "number",
+            "total": "number"
+          }
+        }
+      }
+    },
+    "createUser": {
+      "success": {
+        "statusCode": 201,
+        "body": {
+          "success": true,
+          "data": {
+            "id": "number",
+            "email": "string",
+            "firstName": "string",
+            "lastName": "string",
+            "role": "string",
+            "createdAt": "string"
+          }
+        }
+      },
+      "duplicate": {
+        "statusCode": 409,
+        "body": {
+          "success": false,
+          "error": "User already exists"
+        }
+      }
+    }
+  },
+  "headers": {
+    "common": {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "User-Agent": "Playwright-Test-Framework"
+    },
+    "authenticated": {
+      "Authorization": "Bearer {token}",
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    }
+  },
+  "testScenarios": {
+    "authentication": [
+      {
+        "name": "Valid login",
+        "endpoint": "/api/v1/auth/login",
+        "method": "POST",
+        "body": "login.valid",
+        "expectedStatus": 200,
+        "expectedResponse": "login.success"
+      },
+      {
+        "name": "Invalid credentials",
+        "endpoint": "/api/v1/auth/login",
+        "method": "POST",
+        "body": "login.invalid",
+        "expectedStatus": 401,
+        "expectedResponse": "login.failure"
+      },
+      {
+        "name": "Missing email",
+        "endpoint": "/api/v1/auth/login",
+        "method": "POST",
+        "body": "login.missingEmail",
+        "expectedStatus": 400
+      }
+    ],
+    "userManagement": [
+      {
+        "name": "Get all users",
+        "endpoint": "/api/v1/users",
+        "method": "GET",
+        "requiresAuth": true,
+        "expectedStatus": 200
+      },
+      {
+        "name": "Create new user",
+        "endpoint": "/api/v1/users",
+        "method": "POST",
+        "body": "createUser.valid",
+        "requiresAuth": true,
+        "expectedStatus": 201
+      },
+      {
+        "name": "Get user by ID",
+        "endpoint": "/api/v1/users/1",
+        "method": "GET",
+        "requiresAuth": true,
+        "expectedStatus": 200
+      }
+    ]
+  },
+  "performanceThresholds": {
+    "responseTime": {
+      "fast": 200,
+      "acceptable": 1000,
+      "slow": 3000
+    },
+    "endpoints": {
+      "/api/v1/auth/login": 500,
+      "/api/v1/users": 800,
+      "/api/v1/products": 1000,
+      "/api/v1/orders": 1200
+    }
+  }
+}

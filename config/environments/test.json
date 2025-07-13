@@ -1,0 +1,32 @@
+{
+  "name": "Test Environment",
+  "baseUrl": "https://test.your-application.com",
+  "apiBaseUrl": "https://api-test.your-application.com",
+  "database": {
+    "host": "test-db.your-company.com",
+    "port": 5432,
+    "name": "test_database"
+  },
+  "features": {
+    "enableNewFeatures": true,
+    "debugMode": false,
+    "mockExternalServices": false
+  },
+  "timeouts": {
+    "pageLoad": 30000,
+    "apiResponse": 8000,
+    "elementWait": 10000
+  },
+  "browser": {
+    "headless": true,
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    }
+  },
+  "logging": {
+    "level": "info",
+    "enableConsole": false,
+    "enableFile": true
+  }
+}

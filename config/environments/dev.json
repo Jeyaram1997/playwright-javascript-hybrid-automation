@@ -1,0 +1,32 @@
+{
+  "name": "Development Environment",
+  "baseUrl": "https://dev.your-application.com",
+  "apiBaseUrl": "https://api-dev.your-application.com",
+  "database": {
+    "host": "dev-db.your-company.com",
+    "port": 5432,
+    "name": "dev_database"
+  },
+  "features": {
+    "enableNewFeatures": true,
+    "debugMode": true,
+    "mockExternalServices": true
+  },
+  "timeouts": {
+    "pageLoad": 30000,
+    "apiResponse": 10000,
+    "elementWait": 15000
+  },
+  "browser": {
+    "headless": false,
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    }
+  },
+  "logging": {
+    "level": "debug",
+    "enableConsole": true,
+    "enableFile": true
+  }
+}

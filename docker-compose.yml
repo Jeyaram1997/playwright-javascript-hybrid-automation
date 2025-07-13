@@ -1,0 +1,160 @@
+version: '3.8'
+
+services:
+  # Main test execution service
+  playwright-tests:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: playwright-framework
+    volumes:
+      - ./reports:/app/reports
+      - ./test-data:/app/test-data:ro
+      - ./logs:/app/logs
+    environment:
+      - CI=true
+      - TEST_ENV=docker
+      - HEADLESS=true
+      - PARALLEL_WORKERS=2
+    networks:
+      - test-network
+    depends_on:
+      - report-server
+    profiles:
+      - test
+
+  # Report server for viewing results
+  report-server:
+    image: nginx:alpine
+    container_name: report-server
+    ports:
+      - "8080:80"
+    volumes:
+      - ./reports:/usr/share/nginx/html:ro
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - test-network
+    profiles:
+      - report
+
+  # Selenium Grid Hub (optional for distributed testing)
+  selenium-hub:
+    image: selenium/hub:4.11.0
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+      - "4443:4443"
+      - "4442:4442"
+    environment:
+      - GRID_MAX_SESSION=16
+      - GRID_BROWSER_TIMEOUT=300
+      - GRID_TIMEOUT=300
+    networks:
+      - test-network
+    profiles:
+      - selenium
+
+  # Chrome nodes for Selenium Grid
+  chrome:
+    image: selenium/node-chrome:4.11.0
+    container_name: chrome-node
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+      - NODE_MAX_INSTANCES=4
+      - NODE_MAX_SESSION=4
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      - test-network
+    profiles:
+      - selenium
+    scale: 2
+
+  # Firefox nodes for Selenium Grid
+  firefox:
+    image: selenium/node-firefox:4.11.0
+    container_name: firefox-node
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
+      - NODE_MAX_INSTANCES=4
+      - NODE_MAX_SESSION=4
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      - test-network
+    profiles:
+      - selenium
+    scale: 2
+
+  # Database for test results (optional)
+  postgres:
+    image: postgres:15-alpine
+    container_name: test-database
+    environment:
+      - POSTGRES_DB=test_results
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - test-network
+    profiles:
+      - database
+
+  # Redis for caching and session management (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: test-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - test-network
+    profiles:
+      - cache
+
+  # Allure report generator service
+  allure-server:
+    image: frankescobar/allure-docker-service
+    container_name: allure-server
+    environment:
+      CHECK_RESULTS_EVERY_SECONDS: 1
+      KEEP_HISTORY: 1
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./reports/allure-results:/app/allure-results
+      - ./reports/allure-reports:/app/default-reports
+    networks:
+      - test-network
+    profiles:
+      - allure
+
+networks:
+  test-network:
+    driver: bridge
+    name: playwright-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+# Example usage commands:
+# docker-compose --profile test up --build                    # Run tests only
+# docker-compose --profile report up                          # Start report server
+# docker-compose --profile selenium up                        # Start Selenium Grid
+# docker-compose --profile allure up                          # Start Allure server
+# docker-compose --profile test --profile report up --build   # Run tests + reports
+# docker-compose up --build                                   # Start all services

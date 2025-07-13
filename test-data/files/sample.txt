@@ -1,0 +1,16 @@
+Sample text file for upload testing.
+This file can be used to test file upload functionality.
+
+File Details:
+- Name: sample.txt
+- Type: Plain text
+- Size: Small
+- Purpose: Testing file upload features
+
+Content for testing:
+- Line 1: Simple text
+- Line 2: Numbers 123456789
+- Line 3: Special characters !@#$%^&*()
+- Line 4: Mixed content Test123!@#
+
+End of sample file.
